@@ -6,7 +6,7 @@ Dépôt ayant pour but de rassembler les différents modules destinés à la ré
 Module permettant de se connnecter à un réseau Wi-Fi proche à l'aide d'une interface graphique simple (GUI: Graphical User Interface).
 
 ### Commande permettant de lancer le script:
-Placer vous dans le répertoire où se trouve le dossier de votre module et réaliser les commandes suivantes
+Placez vous dans le répertoire où se trouve le dossier de votre module et réaliser les commandes suivantes
 ```bash
 cd wifi
 ```
