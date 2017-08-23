@@ -1,12 +1,12 @@
 # Imports
 import tkinter as tk
 import os, time
-from WifiModule import WM
+from wifi.WifiModule import WM
 
 # Variable globale
 password = None # Stockera le mot de passe du réseau
 
-class MainWindow:
+class WifiSelectionWindow:
     def __init__(self):
         # Fenêtre vide
         self.root = tk.Tk()
@@ -44,39 +44,47 @@ class MainWindow:
         self.b = tk.Button(self.frame, text="Choisir ce réseau", command=self.buttonSelectWifi, font=("Helvetica", 20))
         self.b.pack()
 
+        # Bouton permettant de fermer la fenêtre
+        self.b2 = tk.Button(self.frame, text="Quitter", command=self.Exit, font=("Helvetica", 20))
+        self.b2.pack()
+
         # Packing des élements
         self.frame.pack()
 
         # Binding des touches (temporaire)
-        self.root.bind('<Escape>', self.EscKey)
+        self.root.bind('<Escape>', self.Exit)
 
         # Lancement de la boucle du programme
         self.root.mainloop()
 
     # Fonctions servant au key binding et au(x) boutons
-    def EscKey(self, event):
-        self.root.quit()
+    def Exit(self, event = None):
+        self.root.destroy()
 
     # Evenement lors du choix de réseau
     def buttonSelectWifi(self):
-        ssid = self.listbox.get(self.listbox.curselection()) # On récupère le SSID désiré
-        inputDialog = PasswordDialog(self.root, ssid) # On demande le mot de passe via une instance de PasswordDialog
-        self.root.wait_window(inputDialog.top) # On attend que l'utilisateur confirme sa saisie
+        try:
+            ssid = self.listbox.get(self.listbox.curselection()) # On récupère le SSID désiré
+            inputDialog = WifiPasswordDialog(self.root, ssid) # On demande le mot de passe via une instance de PasswordDialog
+            self.root.wait_window(inputDialog.top) # On attend que l'utilisateur confirme sa saisie
 
-        # Configuration du fichier wpa_supplicant.conf où sera stocké les informations réseau
-        os.system('sudo wpa_passphrase "' + ssid + '" "' + password + '" >> /etc/wpa_supplicant/wpa_supplicant.conf')
-        os.system("sudo wpa_cli reconfigure")
-        os.system("sudo service networking restart")
+            # Configuration du fichier wpa_supplicant.conf où sera stocké les informations réseau
+            os.system('sudo wpa_passphrase "' + ssid + '" "' + password + '" >> /etc/wpa_supplicant/wpa_supplicant.conf')
+            os.system("sudo wpa_cli reconfigure")
+            os.system("sudo service networking restart")
 
-        # On masque la liste des SSIDs et le bouton de confirmation de choix de réseau
-        self.listbox.pack_forget()
-        self.b.pack_forget()
+            # On masque la liste des SSIDs et le bouton de confirmation de choix de réseau
+            self.listbox.pack_forget()
+            self.b.pack_forget()
+            self.b2.pack_forget()
 
-        # On prévient l'utilisateur que le système va redémarrer
-        self.choose_wifi.config(text= "Le système va redémarrer dans quelques secondes.\nVeuillez ne pas éteindre ou débrancher votre CloudBox.")
+            # On prévient l'utilisateur que le système va redémarrer
+            self.choose_wifi.config(text= "Le système va redémarrer dans quelques secondes.\nVeuillez ne pas éteindre ou débrancher votre CloudBox.")
 
-        # On appelle la fonction rebootSystem
-        self.root.after(1000, self.rebootSystem)
+            # On appelle la fonction rebootSystem
+            self.root.after(1000, self.rebootSystem)
+        except:
+            print("Aucune sélection possible")
 
     # Redémarre le système après 10 secondes
     def rebootSystem(self):
@@ -86,7 +94,7 @@ class MainWindow:
         os.system("sudo reboot")
 
 # Fenêtre secondaire permettant d'insérer le mot de passe du réseau
-class PasswordDialog:
+class WifiPasswordDialog:
     def __init__(self, parent, ssid):
         self.ssid = ssid # Récupération et sauvegarde du SSID du réseau choisi
 
@@ -122,5 +130,3 @@ class PasswordDialog:
 
         self.top.withdraw() # On masque la fenêtre
         self.top.destroy() # On détruit la fenêtre
-
-MW = MainWindow()
