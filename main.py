@@ -1,5 +1,5 @@
 import tkinter as tk
-from wifi.wifiGui import WifiSelectionWindow
+from wifi.WifiGui import WifiSelectionWindow
 
 class MainWindow:
     def __init__(self):
